@@ -225,25 +225,7 @@ void FaceTracking::result() {
 	int xEye[8];
 	int yEye[8];
 	cv::Point2f inputQuad[4];
-
-
-	for (int i = 0; i < 8; i++) {
-		const CameraSpacePoint v = vertexs[coor[i]];
-		ColorSpacePoint point;
-		ERROR_CHECK(coordinateMapper->MapCameraPointToColorSpace(v, &point));
-		int x = static_cast<int>(std::ceil(point.X));
-		int y = static_cast<int> (std::ceil(point.Y));
-
-		if ((x >= 0) && (x < colorWidth) && (y >= 0) && (y < colorHeight)) {
-			xEye[i] = x;
-			yEye[i] = y;
-
-		}
-
-
-	}
-
-	//Mat faceWhite(colorImage.rows, colorImage.cols, CV_8UC3, Scalar(255, 255, 255));
+	
 
 	for (const CameraSpacePoint v : vertexs) {
 		ColorSpacePoint point;
@@ -254,38 +236,11 @@ void FaceTracking::result() {
 
 		if ((x >= 0) && (x < colorWidth) && (y >= 0) && (y < colorHeight)) {
 			cv::circle(colorImage, cv::Point(x, y), 2, colors, -1, CV_AA);
-			//cv::circle(faceWhite, cv::Point(x, y), 2, colors, -1, CV_AA);
+			
 		}
 
 	}
-	//cv::imwrite("facePoint.png", faceWhite);
-	//exit(0);
 
-	//Left Eye
-	if (xEye[0] >= 15 && xEye[1] >= 0 && yEye[2] >= 10 && yEye[3] >= 0) {
-		//cv::rectangle(colorImage, cv::Point(xEye[1] - 15, yEye[3] + 10), cv::Point(xEye[0]+15, yEye[2]-10), cv::Scalar(255), 2, 8 );
-		cv::Rect ROI(cv::Point(xEye[1] - 10, yEye[3] + 15), cv::Point(xEye[0] + 5, yEye[2] - 15));
-		inputQuad[0] = cv::Point2f(ROI.x, ROI.y);
-		inputQuad[1] = cv::Point2f(ROI.x + ROI.width, ROI.y);
-		inputQuad[2] = cv::Point2f(ROI.x, ROI.y + ROI.height);
-		inputQuad[3] = cv::Point2f(ROI.x + ROI.width, ROI.y + ROI.height);
-		//leftEye = colorImage(ROI);
-		cv::Mat M = cv::getPerspectiveTransform(inputQuad, outputQuad);
-		cv::warpPerspective(proceedColorImage, leftEye, M, cv::Size(w, h));
-	}
-
-	//Right Eye
-	if (xEye[4] >= 15 && xEye[5] >= 0 && yEye[6] >= 10 && yEye[7] >= 0) {
-		//cv::rectangle(colorImage, cv::Point(xEye[5] + 15, yEye[7] + 10), cv::Point(xEye[4] - 15, yEye[6] - 10), cv::Scalar(0,255), 2, 8);
-		cv::Rect ROI(cv::Point(xEye[5] + 5, yEye[7] + 15), cv::Point(xEye[4] - 10, yEye[6] - 15));
-		inputQuad[0] = cv::Point2f(ROI.x, ROI.y);
-		inputQuad[1] = cv::Point2f(ROI.x + ROI.width, ROI.y);
-		inputQuad[2] = cv::Point2f(ROI.x, ROI.y + ROI.height);
-		inputQuad[3] = cv::Point2f(ROI.x + ROI.width, ROI.y + ROI.height);
-		//rightEye = colorImage(ROI);
-		cv::Mat M = cv::getPerspectiveTransform(inputQuad, outputQuad);
-		cv::warpPerspective(proceedColorImage, rightEye, M, cv::Size(w, h));
-	}
 
 
 }
